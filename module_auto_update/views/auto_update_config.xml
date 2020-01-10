@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="auto_update_settings_view_form" model="ir.ui.view">
+            <field name="name">auto_update.settings.view.form.inherit.account</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="40"/>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('settings')]" position="inside">
+                    <group name="github_configuration">
+                        <field name="github_type" />
+                        <div attrs="{'invisible': [('github_type','=','https')]}">
+                            <p>Si escoge el tipo ssh deberá configurar las llaves ssh en su servidor y github</p>
+                        </div>
+                        <field name="github_ssh" attrs="{'invisible': [('github_type','=','https')]}" />
+                        <field name="github_https" attrs="{'invisible': [('github_type','=','ssh')]}" />
+                        <field name="github_https_user" attrs="{'invisible': [('github_type','=','ssh')]}" />
+                        <field name="github_https_psw" password="True" attrs="{'invisible': [('github_type','=','ssh')]}" />
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="auto_update_action">
+            <field name="name">Auto Update Configs</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+        </record>
+
+        <menuitem name="Configuración" id="menu_configuration" action="auto_update_action" sequence="60"/>
+
+    </data>
+</odoo>
