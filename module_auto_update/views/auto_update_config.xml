@@ -18,6 +18,7 @@
                         <field name="github_https_user" attrs="{'invisible': [('github_type','=','ssh')]}" />
                         <field name="github_https_psw" password="True" attrs="{'invisible': [('github_type','=','ssh')]}" />
                     </group>
+                    <!-- <button name="test_github_conecction" string="Probar Conexión con Github" type="object" /> -->
                 </xpath>
             </field>
         </record>

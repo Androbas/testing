@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-from odoo import api, fields, models
+
+import subprocess
+from odoo import api, exceptions, fields, models
 
 
 class GithubConfig(models.Model):
@@ -39,6 +41,22 @@ class ResConfigSettings(models.TransientModel):
         string='Github HTTPS',
         help='You need to configure an ssh key in the server'
     )
+
+    @api.multi
+    def test_github_conecction(self):
+        github_config = self.env['github.config'].search([])
+        if not github_config:
+            exceptions.ValidationError('Debe configurar las credenciales de Github y guardarlas')
+        else:
+            if github_config.type == 'ssh':
+                print('ssh connect')
+                connect = "ssh -T git@github.com"
+                res = subprocess.run(connect, shell=True)
+            elif github_config.type == 'https':
+                connect = ''
+                res = subprocess.run(connect, shell=True)
+
+        print(res)
 
     @api.multi
     def set_values(self):
