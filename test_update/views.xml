@@ -18,6 +18,7 @@
                 <form>
                     <group>
                         <field name="name" />
+                        <field name="description" />
                     </group>
                 </form>
             </field>
