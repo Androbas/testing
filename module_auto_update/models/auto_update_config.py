@@ -18,6 +18,7 @@ class GithubConfig(models.Model):
     https_psw = fields.Char('Password Github')
     ssh = fields.Char(string='Github SSH')
     https = fields.Char(string='Github HTTPS')
+    path = fields.Char(string='Path')
 
 class ResConfigSettings(models.TransientModel):
     """Configuration for automatic update from github"""
@@ -41,6 +42,7 @@ class ResConfigSettings(models.TransientModel):
         string='Github HTTPS',
         help='You need to configure an ssh key in the server'
     )
+    modules_path = fields.Char('Path al repositorio')
 
     @api.multi
     def test_github_conecction(self):
@@ -70,7 +72,8 @@ class ResConfigSettings(models.TransientModel):
             'https_user': self.github_https_user,
             'https_psw': self.github_https_psw,
             'ssh': self.github_ssh,
-            'https': self.github_https
+            'https': self.github_https,
+            'path': self.modules_path
         }
         if github_config:
             github_config.write(vals)
@@ -87,4 +90,5 @@ class ResConfigSettings(models.TransientModel):
             res['github_https_psw'] = github_config.https_psw
             res['github_ssh'] = github_config.ssh
             res['github_https'] = github_config.https
+            res['modules_path'] = github_config.path
         return res

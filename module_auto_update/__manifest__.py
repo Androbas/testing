@@ -11,7 +11,7 @@
     'depends': [
     ],
     'data': [
-        'views/auto_update_config.xml',
+        'views/auto_update.xml',
     ],
     'installable': True,
     'auto_install': False,

@@ -1,13 +1,26 @@
 <?xml version="1.0"?>
 <odoo>
     <data>
+
+        <record id="auto_update_update_view_form" model="ir.ui.view">
+            <field name="name">auto_update.update.view.form</field>
+            <field name="model">auto_update.update</field>
+            <field name="priority" eval="40"/>
+            <field name="arch" type="xml">
+                <form>
+                    <button name="update_module" type="object" string="Actualizar" />
+                </form>
+            </field>
+        </record>
+
         <record id="auto_update_settings_view_form" model="ir.ui.view">
             <field name="name">auto_update.settings.view.form.inherit.account</field>
             <field name="model">res.config.settings</field>
             <field name="priority" eval="40"/>
-            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <!-- <field name="inherit_id" ref="base.res_config_settings_view_form"/> -->
             <field name="arch" type="xml">
-                <xpath expr="//div[hasclass('settings')]" position="inside">
+                <!-- <xpath expr="//div[hasclass('settings')]" position="inside"> -->
+                <form>
                     <group name="github_configuration">
                         <field name="github_type" />
                         <div attrs="{'invisible': [('github_type','=','https')]}">
@@ -19,9 +32,17 @@
                         <field name="github_https_psw" password="True" attrs="{'invisible': [('github_type','=','ssh')]}" />
                         <field name="modules_path" attrs="{'invisible': [('github_type','=','ssh')]}" placeholder="/var/lib/odoo/.local/share/Odoo/addons/11.0/" />
                     </group>
-                    <!-- <button name="test_github_conecction" string="Probar Conexión con Github" type="object" /> -->
-                </xpath>
+                </form>
+                    <button name="execute" string="Guardar Configuracion" type="object" />
+                <!-- </xpath> -->
             </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="update_action">
+            <field name="name">Auto Update</field>
+            <field name="res_model">auto_update.update</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
         </record>
 
         <record model="ir.actions.act_window" id="auto_update_action">
@@ -31,7 +52,9 @@
             <field name="view_mode">form</field>
         </record>
 
-        <menuitem name="Configuración" id="menu_configuration" action="auto_update_action" sequence="60"/>
+        <menuitem name="Actualizar" id="menu_auto_update" sequence="60"/>
+        <menuitem name="Actualizar" id="menu_update" parent="menu_auto_update" action="update_action" sequence="10"/>
+        <menuitem name="Configuración" id="menu_configuration" parent="menu_auto_update" action="auto_update_action" sequence="100"/>
 
     </data>
 </odoo>
