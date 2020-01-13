@@ -8,3 +8,4 @@ class TestModel(models.Model):
     _description = ' Model para probar cambios a BD en actualizacion'
 
     name = fields.Char('Nombre')
+    description = fields.Char('Descripcion')
