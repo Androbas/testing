@@ -20,6 +20,7 @@
                         <field name="name" />
                         <field name="description" />
                         <field name="calle" />
+                        <field name="calle2" />
                     </group>
                 </form>
             </field>

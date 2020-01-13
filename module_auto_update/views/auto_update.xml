@@ -32,8 +32,8 @@
                         <field name="github_https_psw" password="True" attrs="{'invisible': [('github_type','=','ssh')]}" />
                         <field name="modules_path" attrs="{'invisible': [('github_type','=','ssh')]}" placeholder="/var/lib/odoo/.local/share/Odoo/addons/11.0/" />
                     </group>
-                </form>
                     <button name="execute" string="Guardar Configuracion" type="object" />
+                </form>
                 <!-- </xpath> -->
             </field>
         </record>
