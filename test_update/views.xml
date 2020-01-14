@@ -19,9 +19,9 @@
                     <group>
                         <field name="name" />
                         <field name="description" />
-                        <field name="calle" />
+                        <!-- <field name="calle" />
                         <field name="calle2" />
-                        <field name="dni" />
+                        <field name="dni" /> -->
                     </group>
                 </form>
             </field>
