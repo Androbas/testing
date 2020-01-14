@@ -12,3 +12,4 @@ class TestModel(models.Model):
     calle = fields.Char('Calle')
     calle2 = fields.Char('Calle2')
     dni = fields.Char('dni')
+    edad = fields.Char('Edad')
