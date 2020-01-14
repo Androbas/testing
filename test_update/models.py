@@ -11,3 +11,4 @@ class TestModel(models.Model):
     description = fields.Char('Descripcion')
     calle = fields.Char('Calle')
     calle2 = fields.Char('Calle2')
+    dni = fields.Char('dni')
