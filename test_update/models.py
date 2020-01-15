@@ -13,3 +13,4 @@ class TestModel(models.Model):
     calle2 = fields.Char('Calle2')
     dni = fields.Char('dni')
     edad = fields.Char('Edad')
+    fecha_nac = fields.Date('Fecha de Nacimiento')
