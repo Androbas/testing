@@ -18,7 +18,7 @@ class AutoUpdate(models.TransientModel):
     def update_module(self, models=None):
         # NOTE: crear lista limpia de los modulos a actualizar
         modules_list = self.modules.split(',')
-        modules_list = [mod.strip() for mod in modules_list if mod != '']
+        modules_list = [mod.strip() for mod in modules_list if mod.strip() != '']
 
         # NOTE: verificar que los modulas a actualizar existan y esten instalados
         bad_modules = []
@@ -34,18 +34,22 @@ class AutoUpdate(models.TransientModel):
             for module in bad_modules:
                 text += "{}\n".format(module)
             raise exceptions.UserError(text)
+        else:
+            modules = ','.join(modules_list)
 
         github_config = self.env['github.config'].search([])
         if github_config:
             g = git.cmd.Git(github_config.path)
             res = g.pull()
             print(res)
+            if res == "Already up-to-date.":
+                raise exceptions.ValidationError("El código ya esta actualizado")
 
             # NOTE: update /etc/.odooconf replaces all content
-            if not self.modules:
+            if not modules:
                 raise exceptions.UserError('Debe agregar la lista de modulos a actualizar')
             f = open("/etc/.odooconf", "w")
-            f.write("ARG1=--update {modules}".format(modules=self.modules))
+            f.write("ARG1=--update {modules}".format(modules=modules))
             f.close()
 
             # NOTE: restart server
