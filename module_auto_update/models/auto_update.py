@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 
 import git
-import logging
 import subprocess
-from odoo import api, models
-
-_logger = logging.getLogger(__name__)
+from odoo import api, exceptions, fields, models
 
 
 class AutoUpdate(models.TransientModel):
     _name = 'auto_update.update'
+
+    modules_list = fields.Char(
+        string='Lista de módulos',
+        help='Lista sin espacios, modulos separados por coma',
+        required=True
+    )
 
     @api.multi
     def update_module(self, models=None):
@@ -17,25 +20,108 @@ class AutoUpdate(models.TransientModel):
         if github_config:
             g = git.cmd.Git(github_config.path)
             res = g.pull()
-            print('-------------res git ---------------')
             print(res)
+
             # NOTE: update /etc/.odooconf replaces all content
-            # TODO: replace test_update,module_auto_update with variable value
+            if not self.modules_list:
+                raise exceptions.UserError('Debe agregar la lista de modulos a actualizar')
             f = open("/etc/.odooconf", "w")
-            f.write("ARG1=--update test_update,module_auto_update")
+            f.write("ARG1=--update {modules}".format(modules=self.modules_list))
             f.close()
 
             # NOTE: restart server
             # TODO: run the service as odoo user without the fucking password
-
-            # import pdb; pdb.set_trace()
-            process = subprocess.Popen('whoami', stdout=subprocess.PIPE)
-            stdout = process.communicate()[0]
-            _logger.info('--------------WHOAMI----------------------')
-            _logger.info('STDOUT:{}'.format(stdout))
-            print('STDOUT:{}'.format(stdout))
-
-            print('----------------------')
-            print(res)
             command = "sudo systemctl restart odooupdate"
             subprocess.run(command, shell=True)
+        else:
+            raise exceptions.UserError('Por favor configure los datos de conexión de Github en el menú de configuración')
+
+
+class GithubConfig(models.Model):
+    _name = 'github.config'
+
+    type = fields.Selection(
+        selection=[
+            ('https', 'HTTPS'),
+            ('ssh', 'SSH')
+        ],
+        string='Tipo de Conexión'
+    )
+    https_user = fields.Char('Mail Github')
+    https_psw = fields.Char('Password Github')
+    ssh = fields.Char(string='Github SSH')
+    https = fields.Char(string='Github HTTPS')
+    path = fields.Char(string='Path')
+
+
+class ResConfigSettings(models.TransientModel):
+    """Configuration for automatic update from github"""
+    _inherit = 'res.config.settings'
+
+    github_type = fields.Selection(
+        selection=[
+            ('https', 'HTTPS'),
+            ('ssh', 'SSH')
+        ],
+        string='Tipo de Conexión'
+    )
+    github_https_user = fields.Char('Mail Github')
+    github_https_psw = fields.Char('Password Github')
+    github_ssh = fields.Char(
+        string='Github SSH',
+        help='You need to configure an ssh key in the server'
+    )
+    github_https = fields.Char(
+        string='Github HTTPS',
+        help='You need to configure an ssh key in the server'
+    )
+    modules_path = fields.Char('Path al repositorio')
+
+    @api.multi
+    def test_github_conecction(self):
+        github_config = self.env['github.config'].search([])
+        if not github_config:
+            exceptions.ValidationError('Debe configurar las credenciales de Github y guardarlas')
+        else:
+            if github_config.type == 'ssh':
+                print('ssh connect')
+                connect = "ssh -T git@github.com"
+                res = subprocess.run(connect, shell=True)
+            elif github_config.type == 'https':
+                connect = ''
+                res = subprocess.run(connect, shell=True)
+
+        print(res)
+
+    @api.multi
+    def set_values(self):
+        # NOTE: guarda los valores del wizard al modelo fijo
+        # NOTE: buscar parametro si exite write si no existe crear
+        super(ResConfigSettings, self).set_values()
+        github_config = self.env['github.config'].search([])
+        vals = {
+            'type': self.github_type,
+            'https_user': self.github_https_user,
+            'https_psw': self.github_https_psw,
+            'ssh': self.github_ssh,
+            'https': self.github_https,
+            'path': self.modules_path
+        }
+        if github_config:
+            github_config.write(vals)
+        else:
+            github_config.create(vals)
+
+    @api.multi
+    def get_values(self):
+        # NOTE: Busca los valores y los devuelve al wizard de configuracion
+        res = super(ResConfigSettings, self).get_values()
+        github_config = self.env['github.config'].search([])
+        if github_config:
+            res['github_type'] = github_config.type
+            res['github_https_user'] = github_config.https_user
+            res['github_https_psw'] = github_config.https_psw
+            res['github_ssh'] = github_config.ssh
+            res['github_https'] = github_config.https
+            res['modules_path'] = github_config.path
+        return res
