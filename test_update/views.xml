@@ -22,10 +22,10 @@
                         <field name="description" />
                         <field name="calle" />
                         <field name="calle2" />
-                        <field name="dni" />
+                        <!--- <field name="dni" />
                         <field name="edad" />
                         <field name="fecha_nac" />
-                        <field name="sume" />
+                        <field name="sume" /> -->
                     </group>
                 </form>
             </field>
