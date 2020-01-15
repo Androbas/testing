@@ -39,14 +39,15 @@ class AutoUpdate(models.TransientModel):
         else:
             modules = ','.join(modules_list)
 
+        # NOTE: search github configuration or error
         github_config = self.env['github.config'].search([])
         if github_config:
             g = git.cmd.Git(github_config.path)
-            
+
             process = subprocess.Popen('whoami', stdout=subprocess.PIPE)
             stdout = process.communicate()[0]
             _logger.info('-----------USER------')
-            _logger.info('USER: ', stdout)
+            _logger.info('USER: {}'.format(stdout))
 
             res = g.pull()
             print(res)
