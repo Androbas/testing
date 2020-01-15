@@ -14,3 +14,4 @@ class TestModel(models.Model):
     dni = fields.Char('dni')
     edad = fields.Char('Edad')
     fecha_nac = fields.Date('Fecha de Nacimiento')
+    sume = fields.Char('Algo')
