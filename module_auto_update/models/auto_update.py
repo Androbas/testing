@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import git
+import logging
 import subprocess
 from odoo import api, exceptions, fields, models
 
+_logger = logging.getLogger(__name__)
 
 class AutoUpdate(models.TransientModel):
     _name = 'auto_update.update'
@@ -40,6 +42,12 @@ class AutoUpdate(models.TransientModel):
         github_config = self.env['github.config'].search([])
         if github_config:
             g = git.cmd.Git(github_config.path)
+            
+            process = subprocess.Popen('whoami', stdout=subprocess.PIPE)
+            stdout = process.communicate()[0]
+            _logger.info('-----------USER------')
+            _logger.info('USER: ', stdout)
+
             res = g.pull()
             print(res)
             if res == "Already up-to-date.":
