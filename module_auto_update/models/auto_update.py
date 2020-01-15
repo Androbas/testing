@@ -3,6 +3,7 @@
 import git
 import logging
 import subprocess
+import sys
 from odoo import api, exceptions, fields, models
 
 _logger = logging.getLogger(__name__)
@@ -48,9 +49,14 @@ class AutoUpdate(models.TransientModel):
             stdout = process.communicate()[0]
             _logger.info('-----------USER------')
             _logger.info('USER: {}'.format(stdout))
+            try:
+                res = g.pull()
+            except:
+                _logger.error(sys.exc_info()[0])
+                raise exceptions.AccessError("""Las carpetas del repositorio no tienen los permisos correctos para hacer el pull.\n
+                                             Por favor corra \"chown -R odoo:odoo /path/to/repository\" como sudo en su servidor\n
+                                             y vuelva a intentarlo.""")
 
-            res = g.pull()
-            print(res)
             if res == "Already up-to-date.":
                 raise exceptions.ValidationError("El código ya esta actualizado")
 
