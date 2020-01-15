@@ -8,7 +8,7 @@ from odoo import api, exceptions, fields, models
 class AutoUpdate(models.TransientModel):
     _name = 'auto_update.update'
 
-    modules_list = fields.Char(
+    modules = fields.Char(
         string='Lista de módulos',
         help='Lista sin espacios, modulos separados por coma',
         required=True
@@ -16,6 +16,25 @@ class AutoUpdate(models.TransientModel):
 
     @api.multi
     def update_module(self, models=None):
+        # NOTE: crear lista limpia de los modulos a actualizar
+        modules_list = self.modules.split(',')
+        modules_list = [mod.strip() for mod in modules_list if mod != '']
+
+        # NOTE: verificar que los modulas a actualizar existan y esten instalados
+        bad_modules = []
+        for module in modules_list:
+            system_module = self.env['ir.module.module'].search([('name', '=', module)])
+            if system_module.state != 'installed':
+                bad_modules.append(module)
+            elif not system_module:
+                bad_modules.append(module)
+
+        if bad_modules:
+            text = "Lo siguientes modulos no existen o no están instalados:\n"
+            for module in bad_modules:
+                text += "{}\n".format(module)
+            raise exceptions.UserError(text)
+
         github_config = self.env['github.config'].search([])
         if github_config:
             g = git.cmd.Git(github_config.path)
@@ -23,10 +42,10 @@ class AutoUpdate(models.TransientModel):
             print(res)
 
             # NOTE: update /etc/.odooconf replaces all content
-            if not self.modules_list:
+            if not self.modules:
                 raise exceptions.UserError('Debe agregar la lista de modulos a actualizar')
             f = open("/etc/.odooconf", "w")
-            f.write("ARG1=--update {modules}".format(modules=self.modules_list))
+            f.write("ARG1=--update {modules}".format(modules=self.modules))
             f.close()
 
             # NOTE: restart server

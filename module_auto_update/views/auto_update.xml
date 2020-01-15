@@ -9,11 +9,11 @@
             <field name="arch" type="xml">
                 <form>
                     <group>
-                        <field name="modules_list" />
+                        <field name="modules" />
                     </group>
                     <footer>
                         <button name="update_module" type="object" string="Actualizar" />
-                        <button string="Cancel" special="cancel" />
+                        <button string="Cancelar" special="cancel" />
                     </footer>
                 </form>
             </field>
